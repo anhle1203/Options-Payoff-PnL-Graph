@@ -3,6 +3,7 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime,timezone
+from dataclass import Option
 
 class OptionStrategies:
     def __init__(self, strike, premium, expiration):
@@ -32,51 +33,39 @@ class OptionStrategies:
 
     def expired(self) -> bool:
         '''Check if the option has expired.'''
-        return self.current > self.expiration 
-
-    def long_call_individual(self, spot: float, strike: float, premium: float) -> float:
-        if self.expired():
-            return -premium  # Loss if expired
-        return max(spot - strike, 0) - premium
-
-    def long_put_individual(self, spot, strike, premium):
-        if self.expired():
-            return -premium  # Loss if expired
-        return max(strike - spot, 0) - premium
-    
+        return self.current > self.expiration
 
     def long_call(self, spot):
         '''
         Calculate payoff for a long call option.
         
-        Parameters:
+        Args:
             spot (float): The current spot price of the underlying asset
             
         Returns:
-            float: The net payoff from the call option     
+            float: The net payoff from the call option  
         '''
         if self.expired():
-            return -self.premium  # Loss if expired
-        if spot > self.strike:
-            return spot - self.strike - self.premium  # Profit if the spot is higher than the strike
-        return -self.premium  # Loss of premium if not profitable
+            return "You cannot enter this expired Option."
+        intrinsic_value = max(0, spot - self.strike)
+        net_payoff = intrinsic_value - self.premium
+        return net_payoff         #range(-prem, ∞)
 
     def long_put(self, spot):
         '''
         Calculate payoff for a long put strategy:
         
-        Parameters:
+        Args:
             spot (float): The current spot price of the underlying asset
             
         Returns:
             float: The net payoff from the put option  
         '''
-        
         if self.expired():
-            return -self.premium  # Loss if expired
-        if spot < self.strike:
-            return self.strike - spot - self.premium  # Profit if the spot is lower than the strike
-        return -self.premium  # Loss of premium if not profitable
+            return "You cannot enter this expired Option."
+        intrinsic_value = max(0, spot - self.strike)
+        net_payoff = intrinsic_value - self.premium
+        return net_payoff  # Profit if the spot is lower than the strike
 
     def bull_call_spread(self, spot, lower_strike, upper_strike, lower_premium, upper_premium):
         '''
@@ -120,6 +109,8 @@ class OptionStrategies:
         '''Check if the option has expired.'''
         return self.current > self.expiration
 
+# ------------------------- Strategies --------------------------------------
+
     def long_call(self, spot: float) -> float:
         '''Buy a call option to profit from rising prices.'''
         if self.expired():
@@ -153,7 +144,7 @@ class OptionStrategies:
         return self.short_call(spot) + self.short_put(spot)
 
     def long_synthetic(self, spot: float) -> float:
-        '''Simulate a long position in the stock using options. Equivalent to buying a call and selling a put.'''
+        '''Buy a Call and sell a Put at the same Strike price, with same underlying security and expiration month'''
         return self.long_call(spot) + self.short_put(spot)
 
     def short_synthetic(self, spot: float) -> float:
@@ -161,11 +152,11 @@ class OptionStrategies:
         return self.short_call(spot) + self.long_put(spot)
 
     def bull_call_spread(self, spot: float) -> float:
-        '''A vertical spread designed to profit from a moderate rise in the price of the underlying asset.'''
+        '''Long ITM Call (lower strike) and Short OTM Call (higher strike)'''
         return self.long_call(spot) - self.short_call(spot + 10)
 
     def bull_put_spread(self, spot: float) -> float:
-        '''A vertical spread aimed at generating profit from a moderate increase in the price of the underlying asset.'''
+        '''Long OTM Put (lower strike) and Short ITM Call (higher strike)'''
         return self.short_put(spot) + self.long_put(spot - 10)
 
     def bear_call_spread(self, spot: float) -> float:
