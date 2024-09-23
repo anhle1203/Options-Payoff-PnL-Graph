@@ -1,0 +1,177 @@
+{
+    "Long Call":{
+        "Investor View": "Bullish on Stock/Index",
+        "Risk": "Limited to the premium paid.",
+        "Reward": "Unlimited",
+        "Breakeven": "Strike Price + Premium Paid"
+    },
+    "Long Put":{
+        "Investor View": "Bearish on Stock/Index",
+        "Risk": "Limited to the premium paid.",
+        "Reward": "Unlimited",
+        "Breakeven": "Strike Price - Premium Paid"
+    },
+    "Short Call":{
+        "Investor View": "VERY Bearish on Stock/Index",
+        "Risk": "Unlimited",
+        "Reward": "Limited to the premium received",
+        "Breakeven": "Strike Price + Premium Received"
+    },
+    "Short Put":{
+        "Investor View": "VERY Bullish on Stock/Index",
+        "Risk": "Unlimited",
+        "Reward": "Limited to the premium paid.",
+        "Breakeven": "Strike Price - Premium Paid"
+    },
+    "Long Straddle":{
+        "Investor View": "Neutral Direction but expecting large volatility in underlying movement",
+        "Risk": "Total net premium paid.",
+        "Reward": "Unlimited",
+        "Lower Breakeven": "Strike Price - Premium Paid",
+        "Higher Breakeven": "Strike Price + Premium Paid"
+    },
+    "Put Straddle":{
+        "Investor View": "Neutral Direction but expecting little volatility in underlying movement",
+        "Risk": "Unlimited",
+        "Reward": "Total net premium paid",
+        "Breakeven": "Strike Price + Premium Paid"
+    },
+    "Long Synthetic":{
+        "Investor View": "Bullish on Stock/Index",
+        "Risk": "Unlimited",
+        "Reward": "Unlimited",
+        "Breakeven": "Strike Price ± net premium paid/received."
+    },
+    "Short Synthetic":{
+        "Investor View": "Bearish on direction of Stock/Index ",
+        "Risk": "Unlimited",
+        "Reward": "Unlimited",
+        "Breakeven": "Strike Price ± net premium paid/received"
+    },
+    "Bull Call Spread":{
+        "Investor View": "Moderately bullish on the Stock/Index",
+        "Risk": "Limited",
+        "Reward": "Limited",
+        "Breakeven": "Strike price of Buy call + net premium paid"
+    },
+    "Bull Put Spread":{
+        "Investor View": "Moderately bullish on the Stock/Index",
+        "Risk": "Limited",
+        "Reward": "Limited",
+        "Breakeven": "Strike price of Short Put - premium received"
+    },
+    "Bear Call Spread":{
+        "Investor View": "Moderately bearish on the Stock/Index",
+        "Risk": "Limited",
+        "Reward": "Limited to the net premium received",
+        "Breakeven": "Strike price of Short Call + premium received"
+    },
+    "Bear Put Spread":{
+        "Investor View": " Moderately beaish on the Stock/Index",
+        "Risk": "Limited to premium paid",
+        "Reward": "Limited",
+        "Breakeven": "Strike price of Long Put - net premium paid"
+    },
+    "Call Backspread":{
+        "Investor View": "Bullish on direction as well as volatility of the Stock/Index",
+        "Risk": "Limited to difference between two Strikes ± net premium paid/received",
+        "Reward": "Unlimited on upside and limited on downside",
+        "Breakeven": "Strike price of Long Call + Strike Price of Long call ± net premium paid/received. In case of net inflow of premium, one more breakeven point = Strike price of Short Call + net premium received"
+    },
+    "Put Backspread":{
+        "Investor View": "Bearish on direction and bullish on volatility of the Stock/Index",
+        "Risk": "Limited to the difference in Strike price of Short Put - Strike price of Long Put ± net premium paid/received",
+        "Reward": "Unlimited on upside and limited on downside",
+        "Breakeven": "Strike price of Long Put + Strike price of Long Put - Strike price of Short Put ± net premium received/paid. In case of net inflow of premium there is one more breakevent point = Strike price of Short Put + net premium received"
+    },
+    "Long Combo":{
+        "Investor View": "Bullish on the Stock/Index",
+        "Risk": "Unlimited",
+        "Reward": "Unlimited",
+        "Breakeven": "Strike price of Long Call + net premium paid (in case there is outflow) or Strike price of Short Put - net premium received (in case there is inflow)"
+    },
+    "Long Strangle":{
+        "Investor View": "Neutral on direction but bullish on volaitlity of the Stock/Index",
+        "Risk": "Limited to net premium paid",
+        "Reward": "Unlimited",
+        "Breakeven": "Buy Call Strike price + net premium paid"
+    },
+    "Short Strangle":{
+        "Investor View": "",
+        "Risk": "",
+        "Reward": "",
+        "Breakeven": ""
+    },
+    "Strap":{
+        "Investor View": "",
+        "Risk": "",
+        "Reward": "",
+        "Breakeven": ""
+    },
+    "Strip":{
+        "Investor View": "",
+        "Risk": "",
+        "Reward": "",
+        "Breakeven": ""
+    },
+    "Long Call Ladder":{
+        "Investor View": "",
+        "Risk": "",
+        "Reward": "",
+        "Breakeven": ""
+    },
+    "Long Put Ladder":{
+        "Investor View": "",
+        "Risk": "",
+        "Reward": "",
+        "Breakeven": ""
+    },
+    "Short Call Ladder":{
+        "Investor View": "",
+        "Risk": "",
+        "Reward": "",
+        "Breakeven": ""
+    },
+    "Short Put Ladder":{
+        "Investor View": "",
+        "Risk": "",
+        "Reward": "",
+        "Breakeven": ""
+    },
+    "Long Call Butterfly":{
+        "Investor View": "",
+        "Risk": "",
+        "Reward": "",
+        "Breakeven": ""
+    },
+    "Short Call Butterfly":{
+        "Investor View": "",
+        "Risk": "",
+        "Reward": "",
+        "Breakeven": ""
+    },
+    "Long Call Condor":{
+        "Investor View": "",
+        "Risk": "",
+        "Reward": "",
+        "Breakeven": ""
+    },
+    "Short Call Condor":{
+        "Investor View": "",
+        "Risk": "",
+        "Reward": "",
+        "Breakeven": ""
+    },
+    "Covered Call":{
+        "Investor View": "",
+        "Risk": "",
+        "Reward": "",
+        "Breakeven": ""
+    },
+    "Covered Put":{
+        "Investor View": "",
+        "Risk": "",
+        "Reward": "",
+        "Breakeven": ""
+    }
+}
