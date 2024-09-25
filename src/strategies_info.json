@@ -1,29 +1,48 @@
 {
     "Long Call":{
+        "Category": "Basic",
         "Investor View": "Bullish on Stock/Index",
         "Risk": "Limited to the premium paid.",
         "Reward": "Unlimited",
         "Breakeven": "Strike Price + Premium Paid"
     },
     "Long Put":{
+        "Category": "Basic",
         "Investor View": "Bearish on Stock/Index",
         "Risk": "Limited to the premium paid.",
         "Reward": "Unlimited",
         "Breakeven": "Strike Price - Premium Paid"
     },
     "Short Call":{
+        "Category": "Basic",
         "Investor View": "VERY Bearish on Stock/Index",
         "Risk": "Unlimited",
         "Reward": "Limited to the premium received",
         "Breakeven": "Strike Price + Premium Received"
     },
     "Short Put":{
+        "Category": "Basic",
         "Investor View": "VERY Bullish on Stock/Index",
         "Risk": "Unlimited",
         "Reward": "Limited to the premium paid.",
         "Breakeven": "Strike Price - Premium Paid"
     },
+    "Covered Call":{
+        "Category": "Basic",
+        "Investor View": "Neutral to bullish direction",
+        "Risk": "Limited",
+        "Reward": "Limited",
+        "Breakeven": "Stock Price - premium received"
+    },
+    "Covered Put":{
+        "Category": "Basic",
+        "Investor View": "Neutral to bearish direction",
+        "Risk": "Unlimited",
+        "Reward": "Limited",
+        "Breakeven": "Stock price + premium received"
+    },
     "Long Straddle":{
+        "Category": "Advanced",
         "Investor View": "Neutral direction but expecting large volatility in underlying movement",
         "Risk": "Total net premium paid.",
         "Reward": "Unlimited",
@@ -31,147 +50,157 @@
         "Higher Breakeven": "Strike Price + Premium Paid"
     },
     "Short Straddle":{
+        "Category": "Advanced",
         "Investor View": "Neutral direction but expecting little volatility in underlying movement",
         "Risk": "Unlimited",
         "Reward": "Total net premium paid",
         "Breakeven": "Strike Price + Premium Paid"
     },
     "Long Synthetic":{
+        "Category": "Advanced",
         "Investor View": "Bullish on Stock/Index",
         "Risk": "Unlimited",
         "Reward": "Unlimited",
         "Breakeven": "Strike Price ± net premium paid/received."
     },
     "Short Synthetic":{
+        "Category": "Advanced",
         "Investor View": "Bearish direction of Stock/Index ",
         "Risk": "Unlimited",
         "Reward": "Unlimited",
         "Breakeven": "Strike Price ± net premium paid/received"
     },
     "Bull Call Spread":{
+        "Category": "Advanced",
         "Investor View": "Moderately bullish on the Stock/Index",
         "Risk": "Limited",
         "Reward": "Limited",
         "Breakeven": "Strike price of Buy call + net premium paid"
     },
     "Bull Put Spread":{
+        "Category": "Advanced",
         "Investor View": "Moderately bullish on the Stock/Index",
         "Risk": "Limited",
         "Reward": "Limited",
         "Breakeven": "Strike price of Short Put - premium received"
     },
     "Bear Call Spread":{
+        "Category": "Advanced",
         "Investor View": "Moderately Bearish on the Stock/Index",
         "Risk": "Limited",
         "Reward": "Limited to the net premium received",
         "Breakeven": "Strike price of Short Call + premium received"
     },
     "Bear Put Spread":{
+        "Category": "Advanced",
         "Investor View": " Moderately beaish on the Stock/Index",
         "Risk": "Limited to premium paid",
         "Reward": "Limited",
         "Breakeven": "Strike price of Long Put - net premium paid"
     },
     "Call Backspread":{
+        "Category": "Advanced",
         "Investor View": "Bullish direction as well as volatility",
         "Risk": "Limited to difference between two Strikes ± net premium paid/received",
         "Reward": "Unlimited on upside and limited on downside",
         "Breakeven": "Strike price of Long Call + Strike Price of Long call ± net premium paid/received. In case of net inflow of premium, one more breakeven point = Strike price of Short Call + net premium received"
     },
     "Put Backspread":{
+        "Category": "Advanced",
         "Investor View": "Bearish direction and bullish on volatility",
         "Risk": "Limited to the difference in Strike price of Short Put - Strike price of Long Put ± net premium paid/received",
         "Reward": "Unlimited on upside and limited on downside",
         "Breakeven": "Strike price of Long Put + Strike price of Long Put - Strike price of Short Put ± net premium received/paid. In case of net inflow of premium there is one more breakeven point = Strike price of Short Put + net premium received"
     },
     "Long Combo":{
+        "Category": "Advanced",
         "Investor View": "Bullish on the Stock/Index",
         "Risk": "Unlimited",
         "Reward": "Unlimited",
         "Breakeven": "Strike price of Long Call + net premium paid (in case there is outflow) or Strike price of Short Put - net premium received (in case there is inflow)"
     },
     "Long Strangle":{
+        "Category": "Advanced",
         "Investor View": "Neutral Direction but Bullish volatility ",
         "Risk": "Limited to net premium paid",
         "Reward": "Unlimited",
         "Breakeven": "Upper: Buy Call Strike price + net premium paid. Lower: Buy Put Strike price - net premium paid."
     },
     "Short Strangle":{
+        "Category": "Advanced",
         "Investor View": "Neutral direction and Bearish volatility",
         "Risk": "Unlimited",
         "Reward": "Limited to net premium paid",
         "Breakeven": "Upper: Short Call Strike price + net premium received. Lower: Sell Put Strike price - net premium received"
     },
     "Strap":{
+        "Category": "Advanced",
         "Investor View": "Bullish direction as well as volatility",
         "Risk": "Limited to net premium paid",
         "Reward": "Unlimited",
         "Breakeven": "Upper: Strike price + (net premium paid / 2). Lower: Strike price - net premium paid"
     },
     "Strip":{
+        "Category": "Advanced",
         "Investor View": "Bearish direction but bullish on volatility",
         "Risk": "Limited to net premium paid",
         "Reward": "Unlimited",
         "Breakeven": "Upper: Strike price + net premium paid. Lower: Strike price - (net premium paid / 2)"
     },
     "Long Call Ladder":{
+        "Category": "Advanced",
         "Investor View": "Neutral direction and Bearish volatility",
         "Risk": "Unlimited",
         "Reward": "Limited",
         "Breakeven": "∑ (Strike price of Short Call - Strike price of Long Call) ± net premium received/paid."
     },
     "Long Put Ladder":{
+        "Category": "Advanced",
         "Investor View": "Neutral direction and Bearish on volatility",
         "Risk": "Unlimited",
         "Reward": "Limited",
         "Breakeven": "∑ (Strike prices of Short Puts) - Strike price of Long Put ± net premium received/paid."
     },
     "Short Call Ladder":{
+        "Category": "Advanced",
         "Investor View": "Neutral direction and bullish volatility",
         "Risk": "Limited",
         "Reward": "Unlimited",
         "Breakeven": "∑ (Strike prices of Long Calls) - Strike price of Short Call ± net premium received/paid."
     },
     "Short Put Ladder":{
+        "Category": "Advanced",
         "Investor View": "Neutral direction and bullish volatility",
         "Risk": "Limited",
         "Reward": "Unlimited",
         "Breakeven": "∑(Strike prices of Long Puts) - Strike price of Short Put ± net premium received/paid."
     },
     "Long Call Butterfly":{
+        "Category": "Advanced",
         "Investor View": "Neutral direction and Bearish volatility",
         "Risk": "Limited to the premium paid.",
         "Reward": "Limited.",
         "Breakeven": "Upper: Strike price of Higher Strike Long Call - net premium paid. Lower: Strike price of Lower Strike Long Call + net premium paid."
     },
     "Short Call Butterfly":{
+        "Category": "Advanced",
         "Investor View": "Neutral direction and bullish volatility",
         "Risk": "Limited to difference between adjacent Strikes - net premium paid.",
         "Reward": "Limited to premium received.",
         "Breakeven": "Upper: Strike price of higher Strike Short Call + net premium paid. Lower: Strike price of Lower Strike Short Call - net premium received."
     },
     "Long Call Condor":{
+        "Category": "Advanced",
         "Investor View": "Neutral direction and Bearish volatility",
         "Risk": "Limited",
         "Reward": "Limited",
         "Breakeven": "Upper: Highest Strike - net premium paid. Lower: Lowest Strike + net premium paid."
     },
     "Short Call Condor":{
+        "Category": "Advanced",
         "Investor View": "Neutral direction, but expecting breakout in either direction",
         "Risk": "Limited",
         "Reward": "Limited",
         "Breakeven": "Upper: Highest Strike - net premium received. Lower: Lowest Strike + net premium received."
-    },
-    "Covered Call":{
-        "Investor View": "Neutral to bullish direction",
-        "Risk": "Limited",
-        "Reward": "Limited",
-        "Breakeven": "Stock Price - premium received"
-    },
-    "Covered Put":{
-        "Investor View": "Neutral to bearish direction",
-        "Risk": "Unlimited",
-        "Reward": "Limited",
-        "Breakeven": "Stock price + premium received"
     }
 }
