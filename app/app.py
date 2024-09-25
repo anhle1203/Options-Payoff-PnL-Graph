@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
-from strategy.option_strategies import OptionStrategies
+from src.option_strategies import OptionStrategies
 from datetime import datetime
 import json
 
