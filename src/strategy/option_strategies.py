@@ -3,7 +3,6 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime,timezone
-from dataclass import Option
 
 class OptionStrategies:
     def __init__(self, strike, premium, expiration):
