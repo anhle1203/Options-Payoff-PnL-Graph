@@ -7,71 +7,117 @@ from datetime import datetime,timezone
 class OptionStrategies:
     def __init__(self, strike, premium, expiration):
         '''
-        Initialize parameters.
-        :param strike: Strike price of the option
-        :param premium: Paid premium for the option
-        :param expiration: Expiration date of the option (YYYY-MM-DD format)
+        Args:
+            strike (float): Strike price of the option
+            premium (float): Paid premium for the option
+            expiration (datetime): Expiration date of the option (YYYY-MM-DD format)
         '''
 
         if not isinstance(strike, (int, float)):
             raise ValueError("Strike price must be a number.")
-        if not isinstance(premium, (int, float)):
-            raise ValueError("Premium must be a number.")
-        if isinstance(expiration,str):
-            try:
-                expiration = datetime.strptime(expiration, '%Y-%m-%d')
-            except:
-                raise ValueError("Expiration date must be in YYYY-MM-DD format.")
-        if current_time is None:
-            current_time = datetime.now(timezone.utc)
+        # if not isinstance(premium, (int, float)):
+        #     raise ValueError("Premium must be a number.")
 
-        self.strike = strike
-        self.premium = premium
-        self.expiration = expiration.replace(tzinfo=timezone.utc)
-        self.current = current_time
+        strike = self.strike
+        # premium = self.premium
 
-    def expired(self) -> bool:
-        '''Check if the option has expired.'''
-        return self.current > self.expiration
 
-    def long_call(self, spot):
+    def long_call(self, spot, premium):
         '''
-        Calculate payoff for a long call option.
-        
         Args:
             spot (float): The current spot price of the underlying asset
             
         Returns:
-            float: The net payoff from the call option  
+            net_payoff (float): The net payoff from the trade 
         '''
-        if self.expired():
-            return "You cannot enter this expired Option."
         intrinsic_value = max(0, spot - self.strike)
-        net_payoff = intrinsic_value - self.premium
-        return net_payoff         #range(-prem, ∞)
+        net_payoff = intrinsic_value - premium
+        return net_payoff         
 
-    def long_put(self, spot):
+    def long_put(self, spot, premium):
         '''
-        Calculate payoff for a long put strategy:
-        
         Args:
             spot (float): The current spot price of the underlying asset
             
         Returns:
-            float: The net payoff from the put option  
+            net_payoff (float): The net payoff from the trade
         '''
-        if self.expired():
-            return "You cannot enter this expired Option."
-        intrinsic_value = max(0, spot - self.strike)
-        net_payoff = intrinsic_value - self.premium
+        intrinsic_value = max(0, self.strike - spot)
+        net_payoff = intrinsic_value - premium
         return net_payoff  # Profit if the spot is lower than the strike
+    
+    def short_call(self, spot, premium):
+        '''
+        Args:
+            spot (float): The current spot price of the underlying asset
+            
+        Returns:
+            net_payoff (float): The net payoff from the trade
+        '''
+        intrinsic_value = min(0, spot - self.strike)
+        net_payoff = premium - intrinsic_value
+        return net_payoff         
+    
+    def short_put(self, spot, premium):
+        '''
+        Args:
+            spot (float): The current spot price of the underlying asset
+            
+        Returns:
+            net_payoff (float): The net payoff from the trade
+        '''
+        intrinsic_value = max(0, self.strike - spot)
+        net_payoff = premium - intrinsic_value
+        return net_payoff
+    
+    def long_straddle(self, spot, call_premium, put_premium):
+        '''
+        Long Call and Put at the same strike and same maturity.
+        Profits made when undelrying shows volatility to cover cost of the trade.
+
+        Args:
+            spot (float): The current spot price of the underlying asset
+            all_premium (float): The premium received for the short call option
+            put_premium (float): The premium received for the short put option
+        Returns:
+            net_payoff (float): The net payoff from the trade
+        '''
+        long_call_payoff = self.long_call(spot, call_premium)
+        long_put_payoff = self.long_put(spot, put_premium)
+        return long_call_payoff + long_put_payoff
+    
+    def short_straddle(self, spot, call_premium, put_premium):
+        '''
+        Sell both call and put option at same strike and same expiry.
+        Profit from little or no movement in price because of the expectation of stability in asset price.
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            call_premium (float): The premium received for the short call option
+            put_premium (float): The premium received for the short put option
+        
+        Returns:
+            float: The net payoff from the short straddle  
+        '''
+        short_call_payoff = self.short_call(spot, call_premium)
+        short_put_payoff = self.short_put(spot, put_premium)
+        return short_call_payoff + short_put_payoff
 
     def bull_call_spread(self, spot, lower_strike, upper_strike, lower_premium, upper_premium):
+
         '''
-        Bull Call Spread Strategy:
-        - Buy a call with a lower strike, sell a call with a higher strike.
+
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): 
+            lower_premium (float):
+            upper_strike (float):
+            upper_premium (float):
+            
+        Returns:
+            net_payoff (float): The net payoff from the trade
         '''
-        net_premium = lower_premium - upper_premium  # Net premium received/spent
+        net_premium = lower_premium - upper_premium  
         if self.expired():
             return -net_premium
         if spot < lower_strike:
@@ -79,13 +125,16 @@ class OptionStrategies:
         elif lower_strike <= spot <= upper_strike:
             return (spot - lower_strike) - net_premium  # Profit if spot is between the two strikes
         return (upper_strike - lower_strike) - net_premium  # Maximum profit if above upper strike
+    
+    def long_synthetic(self, spot, long_call_premium, short_put_premium):
+        
 
     def bear_call_spread(self, spot, lower_strike, upper_strike, lower_premium, upper_premium):
         '''
-        Bear Call Spread Strategy:
-        - Sell a call with a lower strike, buy a call with a higher strike.
+
         '''
         net_premium = lower_premium - upper_premium
+
         if self.expired():
             return -net_premium
         if spot < lower_strike:
@@ -94,19 +143,6 @@ class OptionStrategies:
             return net_premium - (spot - upper_strike)  # Loss if above upper strike
         return net_premium - (spot - lower_strike)  # Partial profit if between strikes
 
-class OptionStrategies:
-    def __init__(self, strike: float, premium: float, expiration: str, current_time: datetime = None):
-        if isinstance(expiration, str):
-            self.expiration = datetime.strptime(expiration, '%Y-%m-%d').replace(tzinfo=timezone.utc)
-        else:
-            self.expiration = expiration
-        self.strike = strike
-        self.premium = premium
-        self.current = current_time if current_time else datetime.now(timezone.utc)
-
-    def expired(self) -> bool:
-        '''Check if the option has expired.'''
-        return self.current > self.expiration
 
 # ------------------------- Strategies --------------------------------------
 
