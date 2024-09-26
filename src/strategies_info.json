@@ -46,8 +46,7 @@
         "Investor View": "Neutral direction but expecting large volatility in underlying movement",
         "Risk": "Total net premium paid.",
         "Reward": "Unlimited",
-        "Lower Breakeven": "Strike Price - Premium Paid",
-        "Higher Breakeven": "Strike Price + Premium Paid"
+        "Breakeven": "\\n Upper: Strike Price + Premium Paid \\n Lower: Strike Price - Premium Paid"
     },
     "Short Straddle":{
         "Category": "Advanced",
@@ -124,28 +123,28 @@
         "Investor View": "Neutral Direction but Bullish volatility ",
         "Risk": "Limited to net premium paid",
         "Reward": "Unlimited",
-        "Breakeven": "Upper: Buy Call Strike price + net premium paid. Lower: Buy Put Strike price - net premium paid."
+        "Breakeven": "\\n Upper: Buy Call Strike price + net premium paid \\n Lower: Buy Put Strike price - net premium paid"
     },
     "Short Strangle":{
         "Category": "Advanced",
         "Investor View": "Neutral direction and Bearish volatility",
         "Risk": "Unlimited",
         "Reward": "Limited to net premium paid",
-        "Breakeven": "Upper: Short Call Strike price + net premium received. Lower: Sell Put Strike price - net premium received"
+        "Breakeven": "\\n Upper: Short Call Strike price + net premium received \\n Lower: Sell Put Strike price - net premium received"
     },
     "Strap":{
         "Category": "Advanced",
         "Investor View": "Bullish direction as well as volatility",
         "Risk": "Limited to net premium paid",
         "Reward": "Unlimited",
-        "Breakeven": "Upper: Strike price + (net premium paid / 2). Lower: Strike price - net premium paid"
+        "Breakeven": "\\n Upper: Strike price + (net premium paid / 2) \\n Lower: Strike price - net premium paid"
     },
     "Strip":{
         "Category": "Advanced",
         "Investor View": "Bearish direction but bullish on volatility",
         "Risk": "Limited to net premium paid",
         "Reward": "Unlimited",
-        "Breakeven": "Upper: Strike price + net premium paid. Lower: Strike price - (net premium paid / 2)"
+        "Breakeven": " \\n Upper: Strike price + net premium paid \\n Lower: Strike price - (net premium paid / 2)"
     },
     "Long Call Ladder":{
         "Category": "Advanced",
@@ -180,27 +179,27 @@
         "Investor View": "Neutral direction and Bearish volatility",
         "Risk": "Limited to the premium paid.",
         "Reward": "Limited.",
-        "Breakeven": "Upper: Strike price of Higher Strike Long Call - net premium paid. Lower: Strike price of Lower Strike Long Call + net premium paid."
+        "Breakeven": "\\n Upper: Strike price of Higher Strike Long Call - net premium paid \\n Lower: Strike price of Lower Strike Long Call + net premium paid"
     },
     "Short Call Butterfly":{
         "Category": "Advanced",
         "Investor View": "Neutral direction and bullish volatility",
         "Risk": "Limited to difference between adjacent Strikes - net premium paid.",
         "Reward": "Limited to premium received.",
-        "Breakeven": "Upper: Strike price of higher Strike Short Call + net premium paid. Lower: Strike price of Lower Strike Short Call - net premium received."
+        "Breakeven": "\\n Upper: Strike price of higher Strike Short Call + net premium paid \\n Lower: Strike price of Lower Strike Short Call - net premium received"
     },
     "Long Call Condor":{
         "Category": "Advanced",
         "Investor View": "Neutral direction and Bearish volatility",
         "Risk": "Limited",
         "Reward": "Limited",
-        "Breakeven": "Upper: Highest Strike - net premium paid. Lower: Lowest Strike + net premium paid."
+        "Breakeven": "\\n Upper: Highest Strike - net premium paid \\n Lower: Lowest Strike + net premium paid"
     },
     "Short Call Condor":{
         "Category": "Advanced",
         "Investor View": "Neutral direction, but expecting breakout in either direction",
         "Risk": "Limited",
         "Reward": "Limited",
-        "Breakeven": "Upper: Highest Strike - net premium received. Lower: Lowest Strike + net premium received."
+        "Breakeven": "\\n Upper: Highest Strike - net premium received \\n Lower: Lowest Strike + net premium received"
     }
 }
