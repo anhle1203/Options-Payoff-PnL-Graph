@@ -1,11 +1,9 @@
-# strategy/option_strategies.py
-
 import pandas as pd
 import numpy as np
 from datetime import datetime,timezone
 
 class OptionStrategies:
-    def __init__(self, strike, premium, expiration):
+    def __init__(self, strike):
         '''
         Args:
             strike (float): Strike price of the option
@@ -18,7 +16,7 @@ class OptionStrategies:
         # if not isinstance(premium, (int, float)):
         #     raise ValueError("Premium must be a number.")
 
-        strike = self.strike
+        self.strike = strike
         # premium = self.premium
 
 
@@ -54,7 +52,7 @@ class OptionStrategies:
         Returns:
             net_payoff (float): The net payoff from the trade
         '''
-        intrinsic_value = min(0, spot - self.strike)
+        intrinsic_value = max(0, spot - self.strike)
         net_payoff = premium - intrinsic_value
         return net_payoff         
     
@@ -62,7 +60,6 @@ class OptionStrategies:
         '''
         Args:
             spot (float): The current spot price of the underlying asset
-            
         Returns:
             net_payoff (float): The net payoff from the trade
         '''
@@ -72,24 +69,25 @@ class OptionStrategies:
     
     def long_straddle(self, spot, call_premium, put_premium):
         '''
-        Long Call and Put at the same strike and same maturity.
+        Long both Call and Put at the same strike and same maturity.
         Profits made when undelrying shows volatility to cover cost of the trade.
 
         Args:
             spot (float): The current spot price of the underlying asset
-            all_premium (float): The premium received for the short call option
+            call_premium (float): The premium received for the short call option
             put_premium (float): The premium received for the short put option
         Returns:
-            net_payoff (float): The net payoff from the trade
+            tuple: all the payoffs
         '''
         long_call_payoff = self.long_call(spot, call_premium)
         long_put_payoff = self.long_put(spot, put_premium)
-        return long_call_payoff + long_put_payoff
+        net_payoff = long_call_payoff + long_put_payoff
+        return long_call_payoff, long_put_payoff, net_payoff
     
     def short_straddle(self, spot, call_premium, put_premium):
         '''
-        Sell both call and put option at same strike and same expiry.
-        Profit from little or no movement in price because of the expectation of stability in asset price.
+        Short both Call and Put at same strike and same expiry.
+        Expects payoff characteristics similar to holding the stock. It has benefit of being much cheaper than buying the underlying outright.
         
         Args:
             spot (float): The current spot price of the underlying asset
@@ -97,168 +95,627 @@ class OptionStrategies:
             put_premium (float): The premium received for the short put option
         
         Returns:
-            float: The net payoff from the short straddle  
+            tuple: all the payoffs 
         '''
         short_call_payoff = self.short_call(spot, call_premium)
         short_put_payoff = self.short_put(spot, put_premium)
-        return short_call_payoff + short_put_payoff
-
-    def bull_call_spread(self, spot, lower_strike, upper_strike, lower_premium, upper_premium):
-
+        net_payoff = short_call_payoff + short_put_payoff
+        return short_call_payoff, short_put_payoff, net_payoff
+    
+    def long_synthetic(self, spot, call_premium, put_premium):
         '''
+        Long Call and Short Put at the same strike and same maturity.
+        Profits made when undelrying shows volatility to cover cost of the trade.
 
         Args:
             spot (float): The current spot price of the underlying asset
-            lower_strike (float): 
-            lower_premium (float):
-            upper_strike (float):
-            upper_premium (float):
+            call_premium (float): The premium received for the short call option
+            put_premium (float): The premium received for the short put option
+        Returns:
+            tuple: all the payoffs
+        '''
+        long_call_payoff = self.long_call(spot, call_premium)
+        short_put_payoff = self.short_put(spot, put_premium)
+        net_payoff = long_call_payoff + short_put_payoff
+        return long_call_payoff, short_put_payoff, net_payoff
+
+    def short_synthetic(self, spot, call_premium, put_premium):
+        '''
+        Short Call and Long Put at same strike and same expiry.
+        Behaves exactly like being short on underlying. 
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            call_premium (float): The premium received for the short call option
+            put_premium (float): The premium received for the short put option
+        
+        Returns:
+            tuple: all the payoffs
+        '''
+        short_call_payoff = self.short_call(spot, call_premium)
+        long_put_payoff = self.long_put(spot, put_premium)
+        net_payoff = short_call_payoff + long_put_payoff
+        return short_call_payoff, long_put_payoff, net_payoff
+
+    def bull_call_spread(self, spot, lower_strike, upper_strike, lower_premium, upper_premium):
+        '''
+        Long Call with lower strike & Short Call with higher strike (short call)
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the long call
+            upper_strike (float): Strike price for the short call
+            lower_premium (float): Premium paid for the long call
+            upper_premium (float): Premium received for the short call
             
         Returns:
-            net_payoff (float): The net payoff from the trade
+            tuple: all the payoffs
         '''
-        net_premium = lower_premium - upper_premium  
-        if self.expired():
-            return -net_premium
-        if spot < lower_strike:
-            return -net_premium  # Loss of net premium if below lower strike
-        elif lower_strike <= spot <= upper_strike:
-            return (spot - lower_strike) - net_premium  # Profit if spot is between the two strikes
-        return (upper_strike - lower_strike) - net_premium  # Maximum profit if above upper strike
-    
-    def long_synthetic(self, spot, long_call_premium, short_put_premium):
         
+        self.strike = lower_strike
+        long_call_payoff = self.long_call(spot, lower_premium)
+
+        self.strike = upper_strike
+        short_call_payoff = self.short_call(spot, upper_premium)
+
+        net_payoff = long_call_payoff + short_call_payoff
+
+        return long_call_payoff, short_call_payoff, net_payoff
+    
+    def bull_put_spread(self, spot, lower_strike, upper_strike, lower_premium, upper_premium):
+        '''
+        Long Put with lower strike & Short Put with higher strike
+        Args:
+            lower_strike (float): Strike price for the long put
+            upper_strike (float): Strike price for the short put
+            lower_premium (float): Premium paid for the long put
+            upper_premium (float): Premium received for the short put
+            
+        Returns:
+            tuple: all the payoffs
+        '''
+        self.strike = lower_strike
+        long_put_payoff = self.long_put(spot, lower_premium)
+
+        self.strike = upper_strike
+        short_put_payoff = self.short_put(spot, upper_premium)
+
+        net_payoff = long_put_payoff = short_put_payoff
+        return long_put_payoff, short_put_payoff, net_payoff
+    
+    def bear_call_spread(self, spot, lower_strike, upper_strike, lower_premium, upper_premium):
+        '''
+        Short Call with lower strike & Long Call with higher strike 
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the short call
+            upper_strike (float): Strike price for the long call
+            lower_premium (float): Premium received for the short call
+            upper_premium (float): Premium paid for the long call
+            
+        Returns:
+            tuple: Payoffs for short call, long call, and total net payoff
+        '''
+        self.strike = lower_strike
+        short_call_payoff = self.short_call(spot, lower_premium)
+
+        self.strike = upper_strike
+        long_call_payoff = self.long_call(spot, upper_premium)
+
+        net_payoff = short_call_payoff + long_call_payoff        
+        return short_call_payoff, long_call_payoff, net_payoff
 
     def bear_call_spread(self, spot, lower_strike, upper_strike, lower_premium, upper_premium):
         '''
-
+        Short put with lower strike & Long Put at higher strike
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the short put
+            upper_strike (float): Strike price for the long put
+            lower_premium (float): Premium received for the short put
+            upper_premium (float): Premium paid for the long put
+        
+        Returns:
+            tuple: Payoffs for long put, short put, and total net payoff
         '''
-        net_premium = lower_premium - upper_premium
+        self.strike = upper_strike 
+        long_put_payoff = self.long_put(spot, upper_premium)
 
-        if self.expired():
-            return -net_premium
-        if spot < lower_strike:
-            return net_premium  # Profit if below lower strike
-        elif spot > upper_strike:
-            return net_premium - (spot - upper_strike)  # Loss if above upper strike
-        return net_premium - (spot - lower_strike)  # Partial profit if between strikes
+        self.strike = lower_premium
+        short_put_payoff = self.short_put(spot, lower_premium)
 
+        net_payoff = long_put_payoff + short_put_payoff
+        return short_put_payoff, long_put_payoff, net_payoff
+    
 
-# ------------------------- Strategies --------------------------------------
+    def call_backspread(self, spot, lower_strike, upper_strike, lower_premium, upper_premium):
+        '''
+        Short Call with with lower strike & Long 2 Calls with higher strike
+        Works well for bullish market and/or bearish on market with bias to the upside
 
-    def long_call(self, spot: float) -> float:
-        '''Buy a call option to profit from rising prices.'''
-        if self.expired():
-            return -self.premium
-        return max(spot - self.strike, 0) - self.premium
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the short call
+            upper_strike (float): Strike price for the long calls
+            lower_premium (float): Premium received for the short call
+            upper_premium (float): Premium paid for each long call
+            
+        Returns:
+            tuple: Payoffs for short call, long calls, and total net payoff
+        '''
+        self.strike = lower_strike
+        short_call_payoff = self.short_call(spot, lower_premium)
 
-    def long_put(self, spot: float) -> float:
-        '''Buy a put option to profit from falling prices.'''
-        if self.expired():
-            return -self.premium
-        return max(self.strike - spot, 0) - self.premium
+        self.strike = upper_strike
+        long_call_payoff = 2 * self.long_call(spot, upper_premium)
 
-    def short_call(self, spot: float) -> float:
-        '''Sell a call option to profit from falling or stagnant prices.'''
-        if self.expired():
-            return self.premium
-        return min(self.premium - (spot - self.strike), self.premium)
+        net_payoff = short_call_payoff + long_call_payoff
 
-    def short_put(self, spot: float) -> float:
-        '''Sell a put option to profit from rising or stagnant prices.'''
-        if self.expired():
-            return self.premium
-        return min(self.premium - (self.strike - spot), self.premium)
+        return short_call_payoff, long_call_payoff, net_payoff
 
-    def long_straddle(self, spot: float) -> float:
-        '''Buy both a call and a put at the same strike, profiting from significant price moves in either direction.'''
-        return self.long_call(spot) + self.long_put(spot)
+    def put_backspread(self, spot, lower_strike, upper_strike, lower_premium, upper_premium):
+        '''
+        Put Backspread Strategy:
+        - Sell a put at a higher strike (short put).
+        - Buy two puts at a lower strike (long puts).
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the long puts
+            upper_strike (float): Strike price for the short put
+            lower_premium (float): Premium paid for each long put
+            upper_premium (float): Premium received for the short put
+            
+        Returns:
+            tuple: Payoffs for short put, long puts, and total net payoff
+        '''
+        self.strike = lower_strike
+        short_put_payoff = self.short_put(spot, lower_premium)
 
-    def short_straddle(self, spot: float) -> float:
-        '''Sell both a call and a put at the same strike, profiting from low volatility and price staying near the strike.'''
-        return self.short_call(spot) + self.short_put(spot)
+        self.strike = upper_strike
+        long_put_payoff = 2 * self.long_put(spot, upper_premium)
 
-    def long_synthetic(self, spot: float) -> float:
-        '''Buy a Call and sell a Put at the same Strike price, with same underlying security and expiration month'''
-        return self.long_call(spot) + self.short_put(spot)
+        net_payoff = short_put_payoff + long_put_payoff
 
-    def short_synthetic(self, spot: float) -> float:
-        '''Simulate a short position in the stock using options. Equivalent to selling a call and buying a put.'''
-        return self.short_call(spot) + self.long_put(spot)
+        return short_put_payoff, long_put_payoff, net_payoff
+    
+    def long_combo(self, spot, lower_strike, upper_strike, call_premium, put_premium):
+        '''
+        Short Put at lower strike & Long Call at higher strike
+        Quite similar to Long Synthetic (Short Put & Long Call same strike) but only with different strikes
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the short put
+            upper_strike (float): Strike price for the long call
+            call_premium (float): Premium paid for the long call
+            put_premium (float): Premium received for the short put
+        
+        Returns:
+            tuple: Payoffs for long call, short put, and total net payoff
+        '''
+        self.strike = lower_strike
+        short_put_payoff = self.short_put(spot, put_premium)
 
-    def bull_call_spread(self, spot: float) -> float:
-        '''Long ITM Call (lower strike) and Short OTM Call (higher strike)'''
-        return self.long_call(spot) - self.short_call(spot + 10)
+        self.strike = upper_strike
+        long_call_payoff = 2 * self.long_call(spot, call_premium)
 
-    def bull_put_spread(self, spot: float) -> float:
-        '''Long OTM Put (lower strike) and Short ITM Call (higher strike)'''
-        return self.short_put(spot) + self.long_put(spot - 10)
+        net_payoff = short_put_payoff + long_call_payoff
 
-    def bear_call_spread(self, spot: float) -> float:
-        '''A vertical spread intended to profit from a decline in the price of the underlying asset.'''
-        return self.short_call(spot) + self.long_call(spot + 10)
+        return short_put_payoff, long_call_payoff, net_payoff
+    
+    def long_strangle(self, spot, lower_strike, upper_strike, call_premium, put_premium):
+        '''
+        Long Put at lower strike & Long Call at higher strike
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the long put
+            upper_strike (float): Strike price for the long call
+            call_premium (float): Premium paid for the long call
+            put_premium (float): Premium paid for the long put
+            
+        Returns:
+            tuple: Payoffs for long call, long put, and total net payoff
+        '''
+        self.strike = lower_strike
+        long_put_payoff = self.long_put(spot, put_premium)
 
-    def bear_put_spread(self, spot: float) -> float:
-        '''A vertical spread designed to profit from a drop in the price of the underlying asset.'''
-        return self.long_put(spot) - self.short_put(spot - 10)
+        self.strike = upper_strike
+        long_call_payoff = self.long_call(spot, call_premium)
 
-    def call_backspread(self, spot: float) -> float:
-        '''Selling one call option and buying more call options at a higher strike, benefiting from rising markets.'''
-        return -2 * self.short_call(spot) + 3 * self.long_call(spot + 10)
+        net_payoff = long_call_payoff + long_put_payoff
+        return long_put_payoff, long_call_payoff, net_payoff
+    
+    def short_strangle(self, spot, lower_strike, upper_strike, call_premium, put_premium):
+        '''
+        Short Put at lower strike & Short Call at higher strike
 
-    def put_backspread(self, spot: float) -> float:
-        '''Selling one put option and buying more put options at a lower strike, profiting from falling markets.'''
-        return -2 * self.short_put(spot) + 3 * self.long_put(spot - 10)
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the short put
+            upper_strike (float): Strike price for the short call
+            call_premium (float): Premium received for the short call
+            put_premium (float): Premium received for the short put
+        
+        Returns:
+            tuple: Payoffs for short call, short put, and total net payoff
+        '''
+        self.strike = lower_strike
+        short_put_payoff = self.short_put(spot, put_premium)
 
-    def long_combo(self, spot: float) -> float:
-        '''A synthetic long position using options, combining a long call and a short put at different strikes.'''
-        return self.long_call(spot + 10) + self.short_put(spot - 10)
+        self.strike = upper_strike
+        short_call_payoff = self.short_call(spot, call_premium)
 
-    def long_strangle(self, spot: float) -> float:
-        '''Buying a call and a put with different strikes, profiting from large movements in either direction.'''
-        return self.long_call(spot + 10) + self.long_put(spot - 10)
+        net_payoff = short_put_payoff + short_call_payoff
+        return short_put_payoff, short_call_payoff, net_payoff
+    
+    def strap(self, spot, call_premium, put_premium):
+        '''
+        Long 2 Calls & Long 1 Put at same strike
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            strike (float): Strike price for both calls and the put
+            call_premium (float): Premium paid for each long call
+            put_premium (float): Premium paid for the long put
+            
+        Returns:
+            tuple: Payoffs for long calls, long put, and total net payoff
+        '''
+        long_call_payoff = 2 * self.long_call(spot, call_premium)  # Buy two calls
 
-    def short_strangle(self, spot: float) -> float:
-        '''Selling a call and a put with different strikes, profiting from price stability near the strikes.'''
-        return self.short_call(spot + 10) + self.short_put(spot - 10)
+        # Long one put at the same strike
+        long_put_payoff = self.long_put(spot, put_premium)
 
-    def strap(self, spot: float) -> float:
-        '''A bullish version of a straddle, involves buying two calls for every put bought.'''
-        return 2 * self.long_call(spot) + self.long_put(spot)
+        # Total net payoff is the sum of the two long calls and one long put
+        net_payoff = long_call_payoff + long_put_payoff
+    
+        return long_call_payoff, long_put_payoff, net_payoff
+    
+    def strip(self, spot, call_premium, put_premium):
+        '''
+        Long 2 Puts & Long Call at same strike
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            strike (float): Strike price for both puts and the call
+            call_premium (float): Premium paid for the long call
+            put_premium (float): Premium paid for each long put
+            
+        Returns:
+            tuple: Payoffs for long call, long puts, and total net payoff
+        '''
+        long_call_payoff = self.long_call(spot, call_premium)
+        long_put_payoff = 2 * self.long_put(spot, put_premium)
 
-    def strip(self, spot: float) -> float:
-        '''A bearish version of a straddle, involves buying two puts for every call bought.'''
-        return self.long_call(spot) + 2 * self.long_put(spot)
+        net_payoff = long_call_payoff + long_put_payoff
+        
+        return long_call_payoff, long_put_payoff, net_payoff
+    
+    def long_call_ladder(self, spot, lower_strike, middle_strike, upper_strike, lower_premium, middle_premium, upper_premium):
+        '''
+        - Long a call at a lower strike price.
+        - Short a call at a middle strike price.
+        - Long a call at a higher strike price.
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the lower call
+            middle_strike (float): Strike price for the short call
+            upper_strike (float): Strike price for the upper call
+            lower_premium (float): Premium paid for the lower long call
+            middle_premium (float): Premium received for the short middle call
+            upper_premium (float): Premium paid for the upper long call
+            
+        Returns:
+            tuple: Payoffs for lower long call, short middle call, upper long call, and total net payoff
+        '''
+        # Long call at lower strike
+        self.strike = lower_strike
+        lower_call_payoff = self.long_call(spot, lower_premium)
 
-    def long_call_butterfly(self, spot: float) -> float:
-        '''Buying one in-the-money call, selling two at-the-money calls, and buying one out-of-the-money call.'''
-        itm_call = self.long_call(spot - 10)
-        atm_calls = 2 * self.short_call(spot)
-        otm_call = self.long_call(spot + 10)
-        return itm_call - atm_calls + otm_call
+        # Short call at middle strike
+        self.strike = middle_strike
+        middle_call_payoff = self.short_call(spot, middle_premium)
 
-    def long_put_butterfly(self, spot: float) -> float:
-        '''Buying one in-the-money put, selling two at-the-money puts, and buying one out-of-the-money put.'''
-        itm_put = self.long_put(spot + 10)
-        atm_puts = 2 * self.short_put(spot)
-        otm_put = self.long_put(spot - 10)
-        return itm_put - atm_puts + otm_put
+        # Long call at upper strike
+        self.strike = upper_strike
+        upper_call_payoff = self.long_call(spot, upper_premium)
 
-    def covered_call(self, spot: float) -> float:
-        '''Selling a call option on a stock owned to generate income and potentially sell the stock at a higher price.'''
-        owned_stock_profit = spot - self.strike
-        call_option = self.short_call(spot)
-        return owned_stock_profit + call_option
+        net_payoff = lower_call_payoff + middle_call_payoff + upper_call_payoff
+        
+        return lower_call_payoff, middle_call_payoff, upper_call_payoff, net_payoff
+    
+    def long_put_ladder(self, spot, upper_strike, middle_strike, lower_strike, upper_premium, middle_premium, lower_premium):
+        '''
+        - Long a put at a higher strike price.
+        - Short a put at a middle strike price.
+        - Long a put at a lower strike price.
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            upper_strike (float): Strike price for the upper put
+            middle_strike (float): Strike price for the short middle put
+            lower_strike (float): Strike price for the lower put
+            upper_premium (float): Premium paid for the upper long put
+            middle_premium (float): Premium received for the short middle put
+            lower_premium (float): Premium paid for the lower long put
+            
+        Returns:
+            tuple: Payoffs for upper long put, short middle put, lower long put, and total net payoff
+        '''
+        # Long put at upper strike
+        self.strike = upper_strike
+        upper_put_payoff = self.long_put(spot, upper_premium)
 
-    def covered_put(self, spot: float) -> float:
-        '''Selling a put option on a stock shorted to generate income and potentially repurchase the stock at a lower price.'''
-        shorted_stock_profit = self.strike - spot
-        put_option = self.short_put(spot)
-        return shorted_stock_profit + put_option
+        # Short put at middle strike
+        self.strike = middle_strike
+        middle_put_payoff = self.short_put(spot, middle_premium)
 
-    def collar(self, spot: float) -> float:
-        '''Buying a put and selling a call to limit the range of possible returns, usually on a stock owned.'''
-        owned_stock_profit = spot - self.strike
-        put_option = self.long_put(spot)
-        call_option = self.short_call(spot)
-        return owned_stock_profit + put_option + call_option
+        # Long put at lower strike
+        self.strike = lower_strike
+        lower_put_payoff = self.long_put(spot, lower_premium)
+
+        net_payoff = upper_put_payoff + middle_put_payoff + lower_put_payoff
+        
+        return upper_put_payoff, middle_put_payoff, lower_put_payoff, net_payoff
+    
+    def short_call_ladder(self, spot, lower_strike, middle_strike, upper_strike, lower_premium, middle_premium, upper_premium):
+        '''
+        Short Call Ladder Strategy:
+        - Short a call at a lower strike price.
+        - Long a call at a middle strike price.
+        - Long a call at a higher strike price.
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the lower call
+            middle_strike (float): Strike price for the middle call
+            upper_strike (float): Strike price for the upper call
+            lower_premium (float): Premium received for the short lower call
+            middle_premium (float): Premium paid for the middle long call
+            upper_premium (float): Premium paid for the upper long call
+            
+        Returns:
+            tuple: Payoffs for lower short call, middle long call, upper long call, and total net payoff
+        '''
+        # Short call at lower strike
+        self.strike = lower_strike
+        lower_call_payoff = self.short_call(spot, lower_premium)
+
+        # Long call at middle strike
+        self.strike = middle_strike
+        middle_call_payoff = self.long_call(spot, middle_premium)
+
+        # Long call at upper strike
+        self.strike = upper_strike
+        upper_call_payoff = self.long_call(spot, upper_premium)
+
+        # Total net payoff
+        net_payoff = lower_call_payoff + middle_call_payoff + upper_call_payoff
+        return lower_call_payoff, middle_call_payoff, upper_call_payoff, net_payoff    
+    
+    def short_call_ladder(self, spot, lower_strike, middle_strike, upper_strike, lower_premium, middle_premium, upper_premium):
+        '''
+        Short Call Ladder Strategy:
+        - Sell a call at a lower strike price (short call).
+        - Buy a call at a middle strike price (long call).
+        - Buy a call at a higher strike price (long call).
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the lower call
+            middle_strike (float): Strike price for the middle call
+            upper_strike (float): Strike price for the upper call
+            lower_premium (float): Premium received for the short lower call
+            middle_premium (float): Premium paid for the middle long call
+            upper_premium (float): Premium paid for the upper long call
+            
+        Returns:
+            tuple: Payoffs for lower short call, middle long call, upper long call, and total net payoff
+        '''
+        # Short call at lower strike
+        self.strike = lower_strike
+        lower_call_payoff = self.short_call(spot, lower_premium)
+
+        # Long call at middle strike
+        self.strike = middle_strike
+        middle_call_payoff = self.long_call(spot, middle_premium)
+
+        # Long call at upper strike
+        self.strike = upper_strike
+        upper_call_payoff = self.long_call(spot, upper_premium)
+
+        # Total net payoff
+        net_payoff = lower_call_payoff + middle_call_payoff + upper_call_payoff
+        return lower_call_payoff, middle_call_payoff, upper_call_payoff, net_payoff
+    
+    def short_put_ladder(self, spot, upper_strike, middle_strike, lower_strike, upper_premium, middle_premium, lower_premium):
+        '''
+        Short Put Ladder Strategy:
+        - Sell a put at a higher strike price (short put).
+        - Buy a put at a middle strike price (long put).
+        - Buy a put at a lower strike price (long put).
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            upper_strike (float): Strike price for the upper put
+            middle_strike (float): Strike price for the middle put
+            lower_strike (float): Strike price for the lower put
+            upper_premium (float): Premium received for the short upper put
+            middle_premium (float): Premium paid for the middle long put
+            lower_premium (float): Premium paid for the lower long put
+            
+        Returns:
+            tuple: Payoffs for upper short put, middle long put, lower long put, and total net payoff
+        '''
+        # Short put at upper strike
+        self.strike = upper_strike
+        upper_put_payoff = self.short_put(spot, upper_premium)
+
+        # Long put at middle strike
+        self.strike = middle_strike
+        middle_put_payoff = self.long_put(spot, middle_premium)
+
+        # Long put at lower strike
+        self.strike = lower_strike
+        lower_put_payoff = self.long_put(spot, lower_premium)
+
+        # Total net payoff
+        net_payoff = upper_put_payoff + middle_put_payoff + lower_put_payoff
+        return upper_put_payoff, middle_put_payoff, lower_put_payoff, net_payoff
+    
+    def long_call_butterfly(self, spot, lower_strike, middle_strike, upper_strike, lower_premium, middle_premium, upper_premium):
+        '''
+        Long Call Butterfly Strategy:
+        - Buy a call at a lower strike price (long call).
+        - Sell two calls at a middle strike price (short calls).
+        - Buy a call at a higher strike price (long call).
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the lower call
+            middle_strike (float): Strike price for the middle short calls
+            upper_strike (float): Strike price for the upper call
+            lower_premium (float): Premium paid for the lower long call
+            middle_premium (float): Premium received for the middle short calls
+            upper_premium (float): Premium paid for the upper long call
+            
+        Returns:
+            tuple: Payoffs for lower long call, middle short calls, upper long call, and total net payoff
+        '''
+        # Long call at lower strike
+        self.strike = lower_strike
+        lower_call_payoff = self.long_call(spot, lower_premium)
+
+        # Short two calls at middle strike
+        self.strike = middle_strike
+        middle_call_payoff = 2 * self.short_call(spot, middle_premium)
+
+        # Long call at upper strike
+        self.strike = upper_strike
+        upper_call_payoff = self.long_call(spot, upper_premium)
+
+        # Total net payoff
+        net_payoff = lower_call_payoff + middle_call_payoff + upper_call_payoff
+        return lower_call_payoff, middle_call_payoff, upper_call_payoff, net_payoff
+    
+    def short_call_butterfly(self, spot, lower_strike, middle_strike, upper_strike, lower_premium, middle_premium, upper_premium):
+        '''
+        Short Call Butterfly Strategy:
+        - Sell a call at a lower strike price (short call).
+        - Buy two calls at a middle strike price (long calls).
+        - Sell a call at a higher strike price (short call).
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the lower call
+            middle_strike (float): Strike price for the middle long calls
+            upper_strike (float): Strike price for the upper call
+            lower_premium (float): Premium received for the lower short call
+            middle_premium (float): Premium paid for the middle long calls
+            upper_premium (float): Premium received for the upper short call
+            
+        Returns:
+            tuple: Payoffs for lower short call, middle long calls, upper short call, and total net payoff
+        '''
+        # Short call at lower strike
+        self.strike = lower_strike
+        lower_call_payoff = self.short_call(spot, lower_premium)
+
+        # Long two calls at middle strike
+        self.strike = middle_strike
+        middle_call_payoff = 2 * self.long_call(spot, middle_premium)
+
+        # Short call at upper strike
+        self.strike = upper_strike
+        upper_call_payoff = self.short_call(spot, upper_premium)
+
+        # Total net payoff
+        net_payoff = lower_call_payoff + middle_call_payoff + upper_call_payoff
+        return lower_call_payoff, middle_call_payoff, upper_call_payoff, net_payoff
+    
+    def long_call_condor(self, spot, lower_strike, lower_middle_strike, upper_middle_strike, upper_strike, lower_premium, lower_middle_premium, upper_middle_premium, upper_premium):
+        '''
+        Long Call Condor Strategy:
+        - Buy a call at a lower strike price (long call).
+        - Sell a call at a lower middle strike price (short call).
+        - Sell a call at an upper middle strike price (short call).
+        - Buy a call at a higher strike price (long call).
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the lower call
+            lower_middle_strike (float): Strike price for the lower middle call
+            upper_middle_strike (float): Strike price for the upper middle call
+            upper_strike (float): Strike price for the higher call
+            lower_premium (float): Premium paid for the lower long call
+            lower_middle_premium (float): Premium received for the lower middle short call
+            upper_middle_premium (float): Premium received for the upper middle short call
+            upper_premium (float): Premium paid for the higher long call
+            
+        Returns:
+            tuple: Payoffs for lower long call, lower middle short call, upper middle short call, higher long call, and total net payoff
+        '''
+        # Long call at lower strike
+        self.strike = lower_strike
+        lower_call_payoff = self.long_call(spot, lower_premium)
+
+        # Short call at lower middle strike
+        self.strike = lower_middle_strike
+        lower_middle_call_payoff = self.short_call(spot, lower_middle_premium)
+
+        # Short call at upper middle strike
+        self.strike = upper_middle_strike
+        upper_middle_call_payoff = self.short_call(spot, upper_middle_premium)
+
+        # Long call at higher strike
+        self.strike = upper_strike
+        upper_call_payoff = self.long_call(spot, upper_premium)
+
+        # Total net payoff
+        net_payoff = lower_call_payoff + lower_middle_call_payoff + upper_middle_call_payoff + upper_call_payoff
+        return lower_call_payoff, lower_middle_call_payoff, upper_middle_call_payoff, upper_call_payoff, net_payoff
+    
+    def short_call_condor(self, spot, lower_strike, lower_middle_strike, upper_middle_strike, upper_strike, lower_premium, lower_middle_premium, upper_middle_premium, upper_premium):
+        '''
+        Short Call Condor Strategy:
+        - Sell a call at a lower strike price (short call).
+        - Buy a call at a lower middle strike price (long call).
+        - Buy a call at an upper middle strike price (long call).
+        - Sell a call at a higher strike price (short call).
+        
+        Args:
+            spot (float): The current spot price of the underlying asset
+            lower_strike (float): Strike price for the lower short call
+            lower_middle_strike (float): Strike price for the lower middle long call
+            upper_middle_strike (float): Strike price for the upper middle long call
+            upper_strike (float): Strike price for the higher short call
+            lower_premium (float): Premium received for the lower short call
+            lower_middle_premium (float): Premium paid for the lower middle long call
+            upper_middle_premium (float): Premium paid for the upper middle long call
+            upper_premium (float): Premium received for the higher short call
+            
+        Returns:
+            tuple: Payoffs for lower short call, lower middle long call, upper middle long call, higher short call, and total net payoff
+        '''
+        # Short call at lower strike
+        self.strike = lower_strike
+        lower_call_payoff = self.short_call(spot, lower_premium)
+
+        # Long call at lower middle strike
+        self.strike = lower_middle_strike
+        lower_middle_call_payoff = self.long_call(spot, lower_middle_premium)
+
+        # Long call at upper middle strike
+        self.strike = upper_middle_strike
+        upper_middle_call_payoff = self.long_call(spot, upper_middle_premium)
+
+        # Short call at higher strike
+        self.strike = upper_strike
+        upper_call_payoff = self.short_call(spot, upper_premium)
+
+        # Total net payoff
+        net_payoff = lower_call_payoff + lower_middle_call_payoff + upper_middle_call_payoff + upper_call_payoff
+        return lower_call_payoff, lower_middle_call_payoff, upper_middle_call_payoff, upper_call_payoff, net_payoff
