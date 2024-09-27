@@ -498,11 +498,11 @@ class OptionStrategies:
     
     def short_call_ladder(self, spot, lower_strike, middle_strike, upper_strike, lower_premium, middle_premium, upper_premium):
         '''
-        Short Call Ladder Strategy:
-        - Sell a call at a lower strike price (short call).
-        - Buy a call at a middle strike price (long call).
-        - Buy a call at a higher strike price (long call).
-        
+        Short Call Ladder Strategy: Short C Long C Long C
+        - Short a call at a lower strike price.
+        - Long a call at a middle strike price.
+        - Long a call at a higher strike price.
+
         Args:
             spot (float): The current spot price of the underlying asset
             lower_strike (float): Strike price for the lower call
@@ -533,10 +533,10 @@ class OptionStrategies:
     
     def short_put_ladder(self, spot, upper_strike, middle_strike, lower_strike, upper_premium, middle_premium, lower_premium):
         '''
-        Short Put Ladder Strategy:
-        - Sell a put at a higher strike price (short put).
-        - Buy a put at a middle strike price (long put).
-        - Buy a put at a lower strike price (long put).
+        Short Put Ladder Strategy: Short P Long P Long P
+        - Short a put at a higher strike price.
+        - Long a put at a middle strike price.
+        - Long a put at a lower strike price.
         
         Args:
             spot (float): The current spot price of the underlying asset
@@ -568,10 +568,10 @@ class OptionStrategies:
     
     def long_call_butterfly(self, spot, lower_strike, middle_strike, upper_strike, lower_premium, middle_premium, upper_premium):
         '''
-        Long Call Butterfly Strategy:
-        - Buy a call at a lower strike price (long call).
-        - Sell two calls at a middle strike price (short calls).
-        - Buy a call at a higher strike price (long call).
+        Long Call Butterfly Strategy: Long 1C Short 2C Long 1C
+        - Long a call at a lower strike price.
+        - Short two calls at a middle strike price.
+        - Long a call at a higher strike price.
         
         Args:
             spot (float): The current spot price of the underlying asset
@@ -603,10 +603,10 @@ class OptionStrategies:
     
     def short_call_butterfly(self, spot, lower_strike, middle_strike, upper_strike, lower_premium, middle_premium, upper_premium):
         '''
-        Short Call Butterfly Strategy:
-        - Sell a call at a lower strike price (short call).
-        - Buy two calls at a middle strike price (long calls).
-        - Sell a call at a higher strike price (short call).
+        Short Call Butterfly Strategy: Short 1C Long2C Short 1C
+        - Short a call at a lower strike price.
+        - Long two calls at a middle strike price.
+        - Short a call at a higher strike price.
         
         Args:
             spot (float): The current spot price of the underlying asset
@@ -638,11 +638,11 @@ class OptionStrategies:
     
     def long_call_condor(self, spot, lower_strike, lower_middle_strike, upper_middle_strike, upper_strike, lower_premium, lower_middle_premium, upper_middle_premium, upper_premium):
         '''
-        Long Call Condor Strategy:
-        - Buy a call at a lower strike price (long call).
-        - Sell a call at a lower middle strike price (short call).
-        - Sell a call at an upper middle strike price (short call).
-        - Buy a call at a higher strike price (long call).
+        Long Call Condor Strategy: Long 1C Short 1C Short 1C Long 1C
+        - Long a call at a lower strike price.
+        - Short a call at a lower middle strike price. 
+        - Short a call at an upper middle strike price. 
+        - Long a call at a higher strike price.
         
         Args:
             spot (float): The current spot price of the underlying asset
@@ -680,11 +680,11 @@ class OptionStrategies:
     
     def short_call_condor(self, spot, lower_strike, lower_middle_strike, upper_middle_strike, upper_strike, lower_premium, lower_middle_premium, upper_middle_premium, upper_premium):
         '''
-        Short Call Condor Strategy:
-        - Sell a call at a lower strike price (short call).
-        - Buy a call at a lower middle strike price (long call).
-        - Buy a call at an upper middle strike price (long call).
-        - Sell a call at a higher strike price (short call).
+        Short Call Condor Strategy: Short 1C Long 1C Long 1C Short 1C
+        - Short a call at a lower strike price.
+        - Long a call at a lower middle strike price.
+        - Long a call at an upper middle strike price.
+        - Short a call at a higher strike price.
         
         Args:
             spot (float): The current spot price of the underlying asset
